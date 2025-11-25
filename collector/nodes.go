@@ -16,7 +16,6 @@ package collector
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -77,7 +76,7 @@ var nodesRolesMetric = prometheus.NewDesc(
 
 var (
 	defaultNodeLabels               = []string{"cluster", "host", "name", "es_master_node", "es_data_node", "es_ingest_node", "es_client_node"}
-	defaultRoleLabels               = []string{"cluster", "host", "name"}
+	defaultRoleLabels               = []string{"cluster", "host", "name", "node"}
 	defaultThreadPoolLabels         = append(defaultNodeLabels, "type")
 	defaultBreakerLabels            = append(defaultNodeLabels, "breaker")
 	defaultIndexingPressureLabels   = []string{"cluster", "host", "name", "indexing_pressure"}
@@ -1883,13 +1882,8 @@ func (c *Nodes) fetchAndDecodeNodeStats() (nodeStatsResponse, error) {
 		return nsr, fmt.Errorf("HTTP Request failed with code %d", res.StatusCode)
 	}
 
-	bts, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nsr, err
-	}
-
-	if err := json.Unmarshal(bts, &nsr); err != nil {
-		return nsr, err
+	if err := json.NewDecoder(res.Body).Decode(&nsr); err != nil {
+		return nsr, fmt.Errorf("failed to decode response body: %w", err)
 	}
 	return nsr, nil
 }
@@ -1905,7 +1899,7 @@ func (c *Nodes) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	for _, node := range nodeStatsResp.Nodes {
+	for nodeID, node := range nodeStatsResp.Nodes {
 		// Handle the node labels metric
 		roles := getRoles(node)
 
@@ -1919,6 +1913,7 @@ func (c *Nodes) Collect(ch chan<- prometheus.Metric) {
 				nodeStatsResp.ClusterName,
 				node.Host,
 				node.Name,
+				nodeID,
 				role,
 			}
 
