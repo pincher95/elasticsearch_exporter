@@ -225,9 +225,9 @@ func TestIndices(t *testing.T) {
              elasticsearch_index_stats_warmer_total{cluster="unknown_cluster",index="foo_2"} 16
 						 # HELP elasticsearch_indices_aliases Record aliases associated with an index
              # TYPE elasticsearch_indices_aliases gauge
-             elasticsearch_indices_aliases{alias="foo_alias_2_1",cluster="unknown_cluster",index="foo_2"} 1
-             elasticsearch_indices_aliases{alias="foo_alias_3_1",cluster="unknown_cluster",index="foo_3"} 1
-             elasticsearch_indices_aliases{alias="foo_alias_3_2",cluster="unknown_cluster",index="foo_3"} 1
+             elasticsearch_indices_aliases{alias="foo_alias_2_1",cluster="unknown_cluster",index="foo_2",node=""} 1
+             elasticsearch_indices_aliases{alias="foo_alias_3_1",cluster="unknown_cluster",index="foo_3",node=""} 1
+             elasticsearch_indices_aliases{alias="foo_alias_3_2",cluster="unknown_cluster",index="foo_3",node=""} 1
              # HELP elasticsearch_indices_completion_bytes_primary Current size of completion with only primary shards on all nodes in bytes
              # TYPE elasticsearch_indices_completion_bytes_primary gauge
              elasticsearch_indices_completion_bytes_primary{cluster="unknown_cluster",index="foo_1"} 0
@@ -531,9 +531,9 @@ func TestIndices(t *testing.T) {
              elasticsearch_index_stats_warmer_total{cluster="unknown_cluster",index="foo_2"} 16
              # HELP elasticsearch_indices_aliases Record aliases associated with an index
              # TYPE elasticsearch_indices_aliases gauge
-             elasticsearch_indices_aliases{alias="foo_alias_2_1",cluster="unknown_cluster",index="foo_2"} 1
-             elasticsearch_indices_aliases{alias="foo_alias_3_1",cluster="unknown_cluster",index="foo_3"} 1
-             elasticsearch_indices_aliases{alias="foo_alias_3_2",cluster="unknown_cluster",index="foo_3"} 1
+             elasticsearch_indices_aliases{alias="foo_alias_2_1",cluster="unknown_cluster",index="foo_2",node=""} 1
+             elasticsearch_indices_aliases{alias="foo_alias_3_1",cluster="unknown_cluster",index="foo_3",node=""} 1
+             elasticsearch_indices_aliases{alias="foo_alias_3_2",cluster="unknown_cluster",index="foo_3",node=""} 1
              # HELP elasticsearch_indices_completion_bytes_primary Current size of completion with only primary shards on all nodes in bytes
              # TYPE elasticsearch_indices_completion_bytes_primary gauge
              elasticsearch_indices_completion_bytes_primary{cluster="unknown_cluster",index="foo_1"} 0
@@ -967,9 +967,9 @@ func TestIndices(t *testing.T) {
              elasticsearch_index_stats_warmer_total{cluster="unknown_cluster",index="foo_2"} 8
              # HELP elasticsearch_indices_aliases Record aliases associated with an index
              # TYPE elasticsearch_indices_aliases gauge
-             elasticsearch_indices_aliases{alias="foo_alias_2_1",cluster="unknown_cluster",index="foo_2"} 1
-             elasticsearch_indices_aliases{alias="foo_alias_3_1",cluster="unknown_cluster",index="foo_3"} 1
-             elasticsearch_indices_aliases{alias="foo_alias_3_2",cluster="unknown_cluster",index="foo_3"} 1
+             elasticsearch_indices_aliases{alias="foo_alias_2_1",cluster="unknown_cluster",index="foo_2",node=""} 1
+             elasticsearch_indices_aliases{alias="foo_alias_3_1",cluster="unknown_cluster",index="foo_3",node=""} 1
+             elasticsearch_indices_aliases{alias="foo_alias_3_2",cluster="unknown_cluster",index="foo_3",node=""} 1
              # HELP elasticsearch_indices_completion_bytes_primary Current size of completion with only primary shards on all nodes in bytes
              # TYPE elasticsearch_indices_completion_bytes_primary gauge
              elasticsearch_indices_completion_bytes_primary{cluster="unknown_cluster",index=".monitoring-data-2"} 0
@@ -1453,9 +1453,9 @@ func TestIndices(t *testing.T) {
              elasticsearch_index_stats_warmer_total{cluster="unknown_cluster",index="foo_3"} 2
              # HELP elasticsearch_indices_aliases Record aliases associated with an index
              # TYPE elasticsearch_indices_aliases gauge
-             elasticsearch_indices_aliases{alias="foo_alias_2_1",cluster="unknown_cluster",index="foo_2"} 1
-             elasticsearch_indices_aliases{alias="foo_alias_3_1",cluster="unknown_cluster",index="foo_3"} 1
-             elasticsearch_indices_aliases{alias="foo_alias_3_2",cluster="unknown_cluster",index="foo_3"} 1
+             elasticsearch_indices_aliases{alias="foo_alias_2_1",cluster="unknown_cluster",index="foo_2",node=""} 1
+             elasticsearch_indices_aliases{alias="foo_alias_3_1",cluster="unknown_cluster",index="foo_3",node=""} 1
+             elasticsearch_indices_aliases{alias="foo_alias_3_2",cluster="unknown_cluster",index="foo_3",node=""} 1
              # HELP elasticsearch_indices_completion_bytes_primary Current size of completion with only primary shards on all nodes in bytes
              # TYPE elasticsearch_indices_completion_bytes_primary gauge
              elasticsearch_indices_completion_bytes_primary{cluster="unknown_cluster",index=".geoip_databases"} 0
@@ -1908,9 +1908,9 @@ func TestIndices(t *testing.T) {
              elasticsearch_index_stats_warmer_total{cluster="unknown_cluster",index="foo_3"} 1
              # HELP elasticsearch_indices_aliases Record aliases associated with an index
              # TYPE elasticsearch_indices_aliases gauge
-             elasticsearch_indices_aliases{alias="foo_alias_2_1",cluster="unknown_cluster",index="foo_2"} 1
-             elasticsearch_indices_aliases{alias="foo_alias_3_1",cluster="unknown_cluster",index="foo_3"} 1
-             elasticsearch_indices_aliases{alias="foo_alias_3_2",cluster="unknown_cluster",index="foo_3"} 1
+             elasticsearch_indices_aliases{alias="foo_alias_2_1",cluster="unknown_cluster",index="foo_2",node="49nZYKtiQdGg7Nl_sVsI1A"} 1
+             elasticsearch_indices_aliases{alias="foo_alias_3_1",cluster="unknown_cluster",index="foo_3",node="49nZYKtiQdGg7Nl_sVsI1A"} 1
+             elasticsearch_indices_aliases{alias="foo_alias_3_2",cluster="unknown_cluster",index="foo_3",node="49nZYKtiQdGg7Nl_sVsI1A"} 1
              # HELP elasticsearch_indices_completion_bytes_primary Current size of completion with only primary shards on all nodes in bytes
              # TYPE elasticsearch_indices_completion_bytes_primary gauge
              elasticsearch_indices_completion_bytes_primary{cluster="unknown_cluster",index=".geoip_databases"} 0
