@@ -15,6 +15,7 @@ package collector
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -52,6 +53,39 @@ func getURL(ctx context.Context, hc *http.Client, log *slog.Logger, u string) ([
 	}
 
 	return b, nil
+}
+
+// getAndDecodeURL performs an HTTP GET and streams JSON decoding directly into target,
+// avoiding an intermediate in-memory buffer of the full response body.
+func getAndDecodeURL(ctx context.Context, hc *http.Client, log *slog.Logger, u string, target any) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := hc.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			log.Warn(
+				"failed to close response body",
+				"err", cerr,
+			)
+		}
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP Request failed with code %d", resp.StatusCode)
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(target); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // bool2Float converts a bool to a float64. True is 1, false is 0.
