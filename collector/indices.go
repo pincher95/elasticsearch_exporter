@@ -406,7 +406,7 @@ var (
 	indicesAliases = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "indices", "aliases"),
 		"Record aliases associated with an index",
-		[]string{"index", "alias", "cluster"},
+		[]string{"index", "alias", "node", "cluster"},
 		nil,
 	)
 
@@ -649,22 +649,8 @@ func (i *Indices) Collect(ch chan<- prometheus.Metric) {
 		)
 		return
 	}
-
-	// Alias stats
-	if i.aliases {
-		for indexName, aliases := range indexStatsResp.Aliases {
-			for _, alias := range aliases {
-				ch <- prometheus.MustNewConstMetric(
-					indicesAliases,
-					prometheus.GaugeValue,
-					1,
-					indexName,
-					alias,
-					i.getClusterName(),
-				)
-			}
-		}
-	}
+	// Alias stats - build node mapping
+	indexNodes := make(map[string][]string) // map of index name to list of nodes
 
 	// Index stats
 	for indexName, indexStats := range indexStatsResp.Indices {
@@ -1291,6 +1277,70 @@ func (i *Indices) Collect(ch chan<- prometheus.Metric) {
 						shardNumber,
 						shard.Routing.Node,
 						strconv.FormatBool(shard.Routing.Primary),
+						i.getClusterName(),
+					)
+				}
+			}
+		}
+
+		// Collect node information for aliases if shard data is available
+		if i.aliases && len(indexStats.Shards) > 0 {
+			nodes := make(map[string]bool)
+			for _, shards := range indexStats.Shards {
+				for _, shard := range shards {
+					nodes[shard.Routing.Node] = true
+				}
+			}
+			if len(nodes) > 0 {
+				nodeList := make([]string, 0, len(nodes))
+				for node := range nodes {
+					nodeList = append(nodeList, node)
+				}
+				// Sort once here so we don't need to sort again when emitting metrics.
+				sort.Strings(nodeList)
+				indexNodes[indexName] = nodeList
+			}
+		}
+	}
+
+	// Emit alias metrics with node information
+	if i.aliases {
+		// deterministic order: sort indices and aliases
+		indexNames := make([]string, 0, len(indexStatsResp.Aliases))
+		for indexName := range indexStatsResp.Aliases {
+			indexNames = append(indexNames, indexName)
+		}
+		sort.Strings(indexNames)
+
+		for _, indexName := range indexNames {
+			aliasNames := indexStatsResp.Aliases[indexName]
+
+			// Check if we have node information for this index
+			if nodes, hasNodes := indexNodes[indexName]; hasNodes {
+				// Nodes are pre-sorted when building indexNodes; emit one metric per (index, alias, node) combination.
+				for _, alias := range aliasNames {
+					for _, node := range nodes {
+						ch <- prometheus.MustNewConstMetric(
+							indicesAliases,
+							prometheus.GaugeValue,
+							1,
+							indexName,
+							alias,
+							node,
+							i.getClusterName(),
+						)
+					}
+				}
+			} else {
+				// No node information available, emit with empty node label
+				for _, alias := range aliasNames {
+					ch <- prometheus.MustNewConstMetric(
+						indicesAliases,
+						prometheus.GaugeValue,
+						1,
+						indexName,
+						alias,
+						"", // empty node label indicates no node info available due to disabled shards or indices without shards stats
 						i.getClusterName(),
 					)
 				}
