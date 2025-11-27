@@ -17,7 +17,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -81,13 +80,14 @@ func (t *TaskCollector) Update(ctx context.Context, ch chan<- prometheus.Metric)
 }
 
 func (t *TaskCollector) fetchTasks(_ context.Context) (tasksResponse, error) {
+	var tr tasksResponse
+
 	u := t.u.ResolveReference(&url.URL{Path: "_tasks"})
 	q := u.Query()
 	q.Set("group_by", "none")
 	q.Set("actions", actionFilter)
 	u.RawQuery = q.Encode()
 
-	var tr tasksResponse
 	res, err := t.hc.Get(u.String())
 	if err != nil {
 		return tr, fmt.Errorf("failed to get data stream stats health from %s://%s:%s%s: %s",
@@ -108,13 +108,11 @@ func (t *TaskCollector) fetchTasks(_ context.Context) (tasksResponse, error) {
 		return tr, fmt.Errorf("HTTP Request to %v failed with code %d", u.String(), res.StatusCode)
 	}
 
-	bts, err := io.ReadAll(res.Body)
-	if err != nil {
+	if err := json.NewDecoder(res.Body).Decode(&tr); err != nil {
 		return tr, err
 	}
 
-	err = json.Unmarshal(bts, &tr)
-	return tr, err
+	return tr, nil
 }
 
 // tasksResponse is a representation of the Task management API.

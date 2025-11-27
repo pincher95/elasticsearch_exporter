@@ -17,14 +17,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
-	"github.com/imdario/mergo"
+	"dario.cat/mergo"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -146,6 +145,8 @@ type clusterSettingsWatermark struct {
 }
 
 func (c *ClusterSettingsCollector) Update(ctx context.Context, ch chan<- prometheus.Metric) error {
+	var data clusterSettingsResponse
+
 	u := c.u.ResolveReference(&url.URL{Path: "_cluster/settings"})
 	q := u.Query()
 	q.Set("include_defaults", "true")
@@ -160,14 +161,18 @@ func (c *ClusterSettingsCollector) Update(ctx context.Context, ch chan<- prometh
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	var data clusterSettingsResponse
-	err = json.Unmarshal(b, &data)
-	if err != nil {
+
+	defer func() {
+		err = resp.Body.Close()
+		if err != nil {
+			c.logger.Warn(
+				"failed to close response body",
+				"err", err,
+			)
+		}
+	}()
+
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return err
 	}
 

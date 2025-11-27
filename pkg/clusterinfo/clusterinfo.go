@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -251,6 +250,7 @@ func (r *Retriever) Run(ctx context.Context) error {
 
 func (r *Retriever) fetchAndDecodeClusterInfo() (*Response, error) {
 	var response *Response
+
 	u := *r.url
 	u.Path = path.Join(r.url.Path, "/")
 
@@ -277,12 +277,7 @@ func (r *Retriever) fetchAndDecodeClusterInfo() (*Response, error) {
 		return nil, fmt.Errorf("HTTP Request failed with code %d", res.StatusCode)
 	}
 
-	bts, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := json.Unmarshal(bts, &response); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
 		return nil, err
 	}
 
