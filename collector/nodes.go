@@ -76,7 +76,7 @@ var nodesRolesMetric = prometheus.NewDesc(
 
 var (
 	defaultNodeLabels               = []string{"cluster", "host", "name", "es_master_node", "es_data_node", "es_ingest_node", "es_client_node"}
-	defaultRoleLabels               = []string{"cluster", "host", "name"}
+	defaultRoleLabels               = []string{"cluster", "host", "name", "node"}
 	defaultThreadPoolLabels         = append(defaultNodeLabels, "type")
 	defaultBreakerLabels            = append(defaultNodeLabels, "breaker")
 	defaultIndexingPressureLabels   = []string{"cluster", "host", "name", "indexing_pressure"}
@@ -1900,7 +1900,7 @@ func (c *Nodes) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	for _, node := range nodeStatsResp.Nodes {
+	for nodeID, node := range nodeStatsResp.Nodes {
 		// Handle the node labels metric
 		roles := getRoles(node)
 
@@ -1914,6 +1914,7 @@ func (c *Nodes) Collect(ch chan<- prometheus.Metric) {
 				nodeStatsResp.ClusterName,
 				node.Host,
 				node.Name,
+				nodeID,
 				role,
 			}
 
